@@ -1,0 +1,139 @@
+# Publishing messages using BigQuery using insert ID
+
+publishing batches of 100 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:98.489832ms; min:35.406163ms p25:75.762176ms p50:91.666714ms p75:110.005719ms p90:140.753435ms p95:160.518101ms p99:228.641015ms max:650.518756ms
+publishing batches of 10 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:77.839192ms; min:30.144036ms p25:60.662459ms p50:74.905188ms p75:89.576672ms p90:103.366338ms p95:110.736479ms p99:140.730226ms max:993.800583ms
+publishing batches of 5 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:71.84247ms; min:22.990669ms p25:57.664752ms p50:71.921571ms p75:85.573783ms p90:94.526599ms p95:102.039816ms p99:118.920914ms max:182.700889ms
+publishing batches of 2 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:70.489135ms; min:22.350231ms p25:56.382906ms p50:71.03214ms p75:83.2675ms p90:93.232812ms p95:100.724655ms p99:116.646154ms max:561.403039ms
+publishing batches of 1 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:67.380517ms; min:18.541751ms p25:52.538816ms p50:66.702033ms p75:79.995612ms p90:89.98972ms p95:95.703875ms p99:110.697911ms max:413.858508ms
+
+publishing batches of 100 messages with 100 bytes (9 kiB/publish)
+1000 requests; mean:85.156785ms; min:33.972757ms p25:66.423479ms p50:80.434112ms p75:95.767398ms p90:110.066997ms p95:128.984755ms p99:176.430692ms max:1.684692426s
+publishing batches of 10 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:73.332227ms; min:26.532008ms p25:58.674953ms p50:72.985431ms p75:85.510626ms p90:96.271376ms p95:102.795757ms p99:120.84169ms max:586.734817ms
+publishing batches of 5 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:73.512184ms; min:21.506764ms p25:59.644871ms p50:72.207767ms p75:85.281387ms p90:97.04638ms p95:103.748099ms p99:122.326819ms max:694.208434ms
+publishing batches of 2 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:70.39506ms; min:23.669245ms p25:56.689257ms p50:69.865343ms p75:84.043906ms p90:94.415096ms p95:100.617308ms p99:115.163958ms max:151.352301ms
+publishing batches of 1 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:66.174042ms; min:22.964324ms p25:51.124527ms p50:65.905138ms p75:79.422947ms p90:90.199439ms p95:97.024122ms p99:113.501508ms max:287.756274ms
+
+publishing batches of 100 messages with 1000 bytes (97 kiB/publish)
+1000 requests; mean:89.229792ms; min:44.77778ms p25:73.915256ms p50:88.685385ms p75:102.393035ms p90:113.471923ms p95:121.062672ms p99:162.202312ms max:219.001928ms
+publishing batches of 10 messages with 1000 bytes (9 kiB/publish)
+1000 requests; mean:75.877833ms; min:28.921218ms p25:61.376804ms p50:74.068701ms p75:88.072087ms p90:100.078505ms p95:105.694756ms p99:117.911584ms max:469.782503ms
+publishing batches of 5 messages with 1000 bytes (4 kiB/publish)
+1000 requests; mean:75.322909ms; min:26.593438ms p25:60.301509ms p50:73.284634ms p75:87.367534ms p90:100.218871ms p95:107.53761ms p99:147.946665ms max:491.759738ms
+publishing batches of 2 messages with 1000 bytes (1 kiB/publish)
+1000 requests; mean:71.295247ms; min:24.427588ms p25:56.292472ms p50:70.56845ms p75:84.468193ms p90:94.774963ms p95:102.400696ms p99:115.94866ms max:284.070655ms
+publishing batches of 1 messages with 1000 bytes (0 kiB/publish)
+1000 requests; mean:66.993646ms; min:24.953539ms p25:53.557497ms p50:67.216684ms p75:79.952943ms p90:90.467167ms p95:96.092674ms p99:109.325608ms max:131.668478ms
+
+publishing batches of 100 messages with 10000 bytes (976 kiB/publish)
+1000 requests; mean:144.788475ms; min:91.04986ms p25:125.159863ms p50:142.199778ms p75:157.993412ms p90:179.897535ms p95:197.194595ms p99:239.486471ms max:331.692978ms
+publishing batches of 10 messages with 10000 bytes (97 kiB/publish)
+1000 requests; mean:81.999299ms; min:32.49197ms p25:66.321945ms p50:79.666537ms p75:94.2194ms p90:105.193066ms p95:113.393246ms p99:148.253202ms max:861.949858ms
+publishing batches of 5 messages with 10000 bytes (48 kiB/publish)
+1000 requests; mean:75.670796ms; min:30.772148ms p25:61.130155ms p50:74.598491ms p75:88.666542ms p90:100.344517ms p95:106.355218ms p99:122.49683ms max:276.045147ms
+publishing batches of 2 messages with 10000 bytes (19 kiB/publish)
+1000 requests; mean:72.995647ms; min:28.336843ms p25:57.910029ms p50:71.10281ms p75:84.099122ms p90:95.054393ms p95:102.360839ms p99:117.587531ms max:731.43452ms
+publishing batches of 1 messages with 10000 bytes (9 kiB/publish)
+1000 requests; mean:69.02754ms; min:26.270888ms p25:54.832511ms p50:67.199469ms p75:80.197896ms p90:90.635658ms p95:96.571665ms p99:123.577956ms max:621.600255ms
+
+
+# Publishing messages using BigQuery WITHOUT insert ID
+
+publishing batches of 100 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:84.672355ms; min:30.131169ms p25:65.383754ms p50:80.39657ms p75:96.471176ms p90:122.487424ms p95:144.017233ms p99:184.318098ms max:317.239217ms
+publishing batches of 10 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:73.309273ms; min:22.560097ms p25:58.690735ms p50:72.551778ms p75:86.254737ms p90:95.528312ms p95:102.967519ms p99:133.543212ms max:399.223601ms
+publishing batches of 5 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:73.595626ms; min:26.898373ms p25:58.873079ms p50:72.506579ms p75:86.027612ms p90:96.944758ms p95:103.364037ms p99:125.747136ms max:694.37381ms
+publishing batches of 2 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:71.059489ms; min:23.863425ms p25:56.813845ms p50:70.711921ms p75:83.30497ms p90:93.421763ms p95:101.844589ms p99:119.195717ms max:193.392495ms
+publishing batches of 1 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:68.847262ms; min:25.852243ms p25:54.745972ms p50:68.537492ms p75:80.870017ms p90:90.820272ms p95:98.041033ms p99:129.728375ms max:366.963347ms
+
+publishing batches of 100 messages with 100 bytes (9 kiB/publish)
+1000 requests; mean:86.337681ms; min:30.390506ms p25:67.615279ms p50:82.272814ms p75:97.888488ms p90:109.951603ms p95:131.895449ms p99:167.453795ms max:1.136766808s
+publishing batches of 10 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:75.255695ms; min:28.037348ms p25:60.325513ms p50:73.090111ms p75:88.476266ms p90:99.665542ms p95:108.796206ms p99:153.319082ms max:235.474692ms
+publishing batches of 5 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:73.274943ms; min:26.446364ms p25:58.596085ms p50:72.757745ms p75:86.275261ms p90:96.187939ms p95:103.901889ms p99:120.112597ms max:442.914974ms
+publishing batches of 2 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:71.066225ms; min:23.942059ms p25:55.671082ms p50:69.652186ms p75:83.700803ms p90:94.573145ms p95:100.595876ms p99:113.638347ms max:1.087871926s
+publishing batches of 1 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:67.182059ms; min:22.572499ms p25:52.598723ms p50:66.734522ms p75:79.217378ms p90:90.696725ms p95:96.736019ms p99:116.429932ms max:275.094314ms
+
+publishing batches of 100 messages with 1000 bytes (97 kiB/publish)
+1000 requests; mean:96.613438ms; min:37.482305ms p25:76.86593ms p50:93.56033ms p75:110.13364ms p90:134.421235ms p95:155.099091ms p99:189.424531ms max:279.765064ms
+publishing batches of 10 messages with 1000 bytes (9 kiB/publish)
+1000 requests; mean:75.361444ms; min:29.15992ms p25:60.896365ms p50:75.152907ms p75:87.875209ms p90:98.866394ms p95:107.161658ms p99:125.53994ms max:268.602459ms
+publishing batches of 5 messages with 1000 bytes (4 kiB/publish)
+1000 requests; mean:72.016537ms; min:21.383537ms p25:57.43013ms p50:70.547598ms p75:83.94911ms p90:96.172982ms p95:104.176566ms p99:129.284652ms max:519.441064ms
+publishing batches of 2 messages with 1000 bytes (1 kiB/publish)
+1000 requests; mean:69.454487ms; min:20.0376ms p25:56.389814ms p50:68.980213ms p75:82.249862ms p90:92.883787ms p95:101.274888ms p99:110.638088ms max:129.855011ms
+publishing batches of 1 messages with 1000 bytes (0 kiB/publish)
+1000 requests; mean:66.677047ms; min:22.554489ms p25:52.768658ms p50:66.969765ms p75:79.09547ms p90:90.538385ms p95:96.153701ms p99:108.984481ms max:140.557308ms
+
+publishing batches of 100 messages with 10000 bytes (976 kiB/publish)
+1000 requests; mean:141.71455ms; min:84.83095ms p25:124.498526ms p50:139.832979ms p75:156.71366ms p90:171.436199ms p95:178.218674ms p99:221.258156ms max:402.274936ms
+publishing batches of 10 messages with 10000 bytes (97 kiB/publish)
+1000 requests; mean:80.455232ms; min:36.144274ms p25:66.487406ms p50:80.430829ms p75:93.547014ms p90:103.486885ms p95:110.234461ms p99:126.526576ms max:167.212077ms
+publishing batches of 5 messages with 10000 bytes (48 kiB/publish)
+1000 requests; mean:78.447495ms; min:27.899024ms p25:62.974515ms p50:77.442344ms p75:90.396623ms p90:102.77471ms p95:111.724417ms p99:151.413655ms max:629.539067ms
+publishing batches of 2 messages with 10000 bytes (19 kiB/publish)
+1000 requests; mean:72.431371ms; min:27.286568ms p25:57.478072ms p50:71.763443ms p75:84.855192ms p90:95.464275ms p95:101.567961ms p99:120.72326ms max:507.497366ms
+publishing batches of 1 messages with 10000 bytes (9 kiB/publish)
+1000 requests; mean:67.486847ms; min:26.738564ms p25:53.143442ms p50:66.67781ms p75:80.324087ms p90:91.261963ms p95:96.985725ms p99:109.122609ms max:539.176876ms
+
+
+# Publishing messages using Pubsub
+
+publishing batches of 100 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:16.751421ms; min:5.009338ms p25:7.10045ms p50:8.695565ms p75:20.819323ms p90:30.030184ms p95:35.685968ms p99:145.552409ms max:437.813948ms
+publishing batches of 10 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:6.891039ms; min:3.577202ms p25:4.895364ms p50:5.806235ms p75:7.032241ms p90:9.340099ms p95:12.012873ms p99:29.899883ms max:89.141952ms
+publishing batches of 5 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:6.628447ms; min:3.457129ms p25:4.774532ms p50:5.654705ms p75:7.000305ms p90:9.304003ms p95:10.994624ms p99:24.01249ms max:77.773029ms
+publishing batches of 2 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:6.949318ms; min:3.587453ms p25:4.835865ms p50:5.963416ms p75:7.380849ms p90:9.765182ms p95:12.894916ms p99:25.160101ms max:95.068206ms
+publishing batches of 1 messages with 10 bytes (0 kiB/publish)
+1000 requests; mean:10.070636ms; min:6.171972ms p25:7.905693ms p50:9.096536ms p75:10.767296ms p90:13.233744ms p95:16.006115ms p99:30.051606ms max:51.369056ms
+
+publishing batches of 100 messages with 100 bytes (9 kiB/publish)
+1000 requests; mean:8.890176ms; min:5.174984ms p25:7.091871ms p50:8.099622ms p75:9.535295ms p90:11.506083ms p95:14.555918ms p99:25.145476ms max:55.451254ms
+publishing batches of 10 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:6.825709ms; min:3.603239ms p25:4.918371ms p50:5.783625ms p75:7.000052ms p90:9.760074ms p95:12.194093ms p99:27.187631ms max:100.647727ms
+publishing batches of 5 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:6.773481ms; min:3.622491ms p25:4.930473ms p50:5.820675ms p75:7.044332ms p90:9.091892ms p95:12.10718ms p99:25.937283ms max:81.477528ms
+publishing batches of 2 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:6.786754ms; min:3.427343ms p25:4.861344ms p50:5.747123ms p75:7.39537ms p90:9.639471ms p95:12.661908ms p99:23.900574ms max:64.83173ms
+publishing batches of 1 messages with 100 bytes (0 kiB/publish)
+1000 requests; mean:10.413515ms; min:6.203247ms p25:7.900547ms p50:8.95124ms p75:10.524528ms p90:12.684579ms p95:15.679471ms p99:25.808944ms max:273.533124ms
+
+publishing batches of 100 messages with 1000 bytes (97 kiB/publish)
+1000 requests; mean:13.417029ms; min:7.970873ms p25:10.797757ms p50:12.122075ms p75:14.456589ms p90:17.744077ms p95:20.875655ms p99:32.658469ms max:97.656538ms
+publishing batches of 10 messages with 1000 bytes (9 kiB/publish)
+1000 requests; mean:7.434805ms; min:3.784722ms p25:5.53698ms p50:6.605955ms p75:7.890364ms p90:10.389364ms p95:12.857418ms p99:26.687412ms max:81.483649ms
+publishing batches of 5 messages with 1000 bytes (4 kiB/publish)
+1000 requests; mean:7.024283ms; min:3.668944ms p25:4.949147ms p50:5.892648ms p75:7.184952ms p90:9.45898ms p95:12.517167ms p99:30.588775ms max:135.373697ms
+publishing batches of 2 messages with 1000 bytes (1 kiB/publish)
+1000 requests; mean:6.708642ms; min:3.496519ms p25:4.708201ms p50:5.751039ms p75:7.076215ms p90:9.610126ms p95:12.337944ms p99:22.250451ms max:66.654536ms
+publishing batches of 1 messages with 1000 bytes (0 kiB/publish)
+1000 requests; mean:10.24807ms; min:6.070529ms p25:7.772596ms p50:8.586208ms p75:9.92835ms p90:12.63237ms p95:15.332046ms p99:44.112881ms max:258.504789ms
+
+publishing batches of 100 messages with 10000 bytes (976 kiB/publish)
+1000 requests; mean:36.734456ms; min:24.370555ms p25:32.160624ms p50:35.127366ms p75:39.331631ms p90:44.685983ms p95:49.210688ms p99:63.660123ms max:105.670499ms
+publishing batches of 10 messages with 10000 bytes (97 kiB/publish)
+1000 requests; mean:11.829894ms; min:7.040935ms p25:9.507554ms p50:10.635945ms p75:12.603744ms p90:15.792989ms p95:18.470058ms p99:33.182278ms max:64.106941ms
+publishing batches of 5 messages with 10000 bytes (48 kiB/publish)
+1000 requests; mean:8.63872ms; min:4.921319ms p25:6.764618ms p50:7.518231ms p75:8.764504ms p90:11.408693ms p95:14.079092ms p99:27.487065ms max:134.486ms
+publishing batches of 2 messages with 10000 bytes (19 kiB/publish)
+1000 requests; mean:7.95193ms; min:4.203408ms p25:5.937092ms p50:6.802429ms p75:7.979229ms p90:9.920523ms p95:12.027682ms p99:32.028861ms max:105.561759ms
+publishing batches of 1 messages with 10000 bytes (9 kiB/publish)
+1000 requests; mean:11.375321ms; min:6.70994ms p25:9.101097ms p50:10.032227ms p75:11.463953ms p90:14.040201ms p95:17.883856ms p99:35.662072ms max:84.737726ms
