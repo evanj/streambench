@@ -1,6 +1,6 @@
 # Streaming Data: Google Cloud Pub/Sub and BigQuery
 
-This is a quick-and-dirty benchmark comparing Google Cloud Pub/Sub and BigQuery streaming insert APIs. The summary is:
+This is a quick-and-dirty benchmark comparing Google Cloud Pub/Sub publish and BigQuery streaming insert APIs. The summary is:
 
 * Pubsub publish is fast: p50: 6m; p95: 13ms
 * BigQuery streaming inserts are pretty slow: p50: 75ms; p95: 110ms
@@ -26,7 +26,8 @@ go run streambench.go --projectID=project --topicID=streamtest --datasetID=strea
 ## Clean up resources
 
 ```
-gcloud pubsub topic delete streamtest
+gcloud pubsub topics delete streamtest
+bq rm streamtest.streamtest
 bq rm streamtest
 ```
 
