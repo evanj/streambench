@@ -6,7 +6,10 @@ set -euf -o pipefail
 # echo commands
 set -x
 
-# Get dependencies: TODO: Use dep or modules
+# Ensure protocol buffer definitions are up to date
+make
+
+# Run tests
 go test -mod=readonly -race ./...
 
 # go test only checks some vet warnings; check all
