@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package messages;
+
+option go_package = "github.com/evanj/streambench/messages";

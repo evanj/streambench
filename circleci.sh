@@ -6,7 +6,10 @@ set -euf -o pipefail
 # echo commands
 set -x
 
-# Get dependencies: TODO: Use dep or modules
+# Ensure protocol buffer definitions are up to date
+make
+
+# Run tests
 go test -mod=readonly -race ./...
 
 # go test only checks some vet warnings; check all
@@ -17,7 +20,7 @@ golint --set_exit_status ./...
 
 diff -u <(echo -n) <(gofmt -d .)
 
-# require that we use go mod tidy. TODO: there must be as easier way
+# require that we use go mod tidy. TODO: there must be an easier way?
 go mod tidy
 CHANGED=$(git status --porcelain --untracked-files=no)
 if [ -n "${CHANGED}" ]; then
