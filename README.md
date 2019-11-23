@@ -9,7 +9,7 @@ This is a quick-and-dirty benchmark comparing Google Cloud Pub/Sub publish and B
 
 ## Create necessary resources
 
-1. Create a topic: `gcloud pubsub topic create streamtest`
+1. Create a topic: `gcloud pubsub topics create streamtest`
 2. Create a subscription for it: `gcloud pubsub subscriptions create --topic=streamtest streamtest-subscription`
 3. Create a BigQuery dataset and table:
 ```
@@ -27,6 +27,7 @@ go run streambench.go --projectID=project --topicID=streamtest --datasetID=strea
 
 ```
 gcloud pubsub topics delete streamtest
+gcloud pubsub subscriptions delete streamtest-subscription
 bq rm streamtest.streamtest
 bq rm streamtest
 ```
@@ -45,3 +46,8 @@ The BigQuery team released a new API version in August 2019. Release Notes: http
 "If you stream data into BigQuery without populating the insertId field, you get the following higher quotas in the US multi-region location. These higher quotas are currently in beta."
 
 It does not look seem like skipping the insertID field makes BigQuery publishing any lower latency.
+
+However, as of 2019-11-23 this is still listed as "Beta" in the Quotas page, so it is possible I never tested the V2 inserts: https://cloud.google.com/bigquery/quotas#streaming_inserts
+
+"you must complete the BigQuery Streaming V2 beta enrollment form in order to use [the V2 streaming insert quotas]"
+
