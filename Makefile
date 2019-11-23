@@ -1,4 +1,4 @@
-# Makefile for updating protocol buffer definitions and tools
+# Makefile for updating protocol buffer definitions and downloading required tools
 BUILD_DIR:=build
 PROTOC:=$(BUILD_DIR)/protoc
 PROTOC_GEN_GO:=$(BUILD_DIR)/protoc-gen-go

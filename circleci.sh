@@ -20,7 +20,7 @@ golint --set_exit_status ./...
 
 diff -u <(echo -n) <(gofmt -d .)
 
-# require that we use go mod tidy. TODO: there must be as easier way
+# require that we use go mod tidy. TODO: there must be an easier way?
 go mod tidy
 CHANGED=$(git status --porcelain --untracked-files=no)
 if [ -n "${CHANGED}" ]; then
