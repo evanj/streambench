@@ -4,15 +4,23 @@ import (
 	"archive/zip"
 	"bytes"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 )
 
-const protocURL = "https://github.com/protocolbuffers/protobuf/releases/download/v3.10.1/protoc-3.10.1-osx-x86_64.zip"
+const version = "3.10.1"
+const protocURLTemplate = "https://github.com/protocolbuffers/protobuf/releases/download/v%s/protoc-%s-%s-x86_64.zip"
 const protocZipPath = "bin/protoc"
+
+var goosToProtocOS = map[string]string{
+	"darwin": "osx",
+	"linux":  "linux",
+}
 
 func main() {
 	output := flag.String("output", "", "Path where we should write the protoc binary")
@@ -25,6 +33,7 @@ func main() {
 	}
 	defer outputFile.Close()
 
+	protocURL := fmt.Sprintf(protocURLTemplate, version, version, goosToProtocOS[runtime.GOOS])
 	log.Printf("downloading protoc from %s ...", protocURL)
 	resp, err := http.Get(protocURL)
 	if err != nil {
