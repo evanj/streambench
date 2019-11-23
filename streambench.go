@@ -81,7 +81,7 @@ type bqInserter struct {
 func (b *bqInserter) insert(ctx context.Context, messages [][]byte) error {
 	tableInsertReq := &bigquery.TableDataInsertAllRequest{}
 	for _, message := range messages {
-		b.rowCounter += 1
+		b.rowCounter++
 		rowData := map[string]bigquery.JsonValue{
 			"record_id": bigquery.JsonValue(b.rowCounter),
 			"data":      bigquery.JsonValue(message),
@@ -143,7 +143,7 @@ func main() {
 	totalWarmUps := 0
 	fmt.Println("warming up the topic/publisher ...")
 	for fastCount := 0; fastCount < warmUpConsecutive; {
-		totalWarmUps += 1
+		totalWarmUps++
 		start := time.Now()
 		err := pubsubInsert.insert(ctx, [][]byte{[]byte("hello")})
 		end := time.Now()
@@ -154,7 +154,7 @@ func main() {
 		if duration > warmUpMinDuration {
 			fastCount = 0
 		} else {
-			fastCount += 1
+			fastCount++
 		}
 	}
 	fmt.Printf("sent %d pubsub warmup requests\n", totalWarmUps)

@@ -3,6 +3,9 @@
 
 set -euf -o pipefail
 
+# echo commands
+set -x
+
 # Get dependencies: TODO: Use dep or modules
 go test -mod=readonly -race ./...
 
