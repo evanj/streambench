@@ -20,7 +20,9 @@ import (
 // 16 = 128 bits which should make collisions "impossible"
 const goroutineIDLength = 16
 
-const publishWaitInterval = 500
+// pubsub has a maximum of 1000 messages per publish request. Hopefully this is enough messages
+// to "fill" the pipeline and keep the publishing busy
+const publishWaitAfterMessages = 2000
 
 func setTimestampNow(ts *timestamp.Timestamp) {
 	// stupidly over-optimized to avoid allocations (probably unnecessary)
@@ -62,7 +64,7 @@ func publisherGoroutine(wg *sync.WaitGroup, topic *pubsub.Topic, idString string
 
 		psMsg.Data = buf.Bytes()
 		results = append(results, topic.Publish(ctx, psMsg))
-		if len(results) >= publishWaitInterval {
+		if len(results) >= publishWaitAfterMessages {
 			waitForPublish(ctx, results)
 			results = results[:0]
 		}

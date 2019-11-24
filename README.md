@@ -51,3 +51,20 @@ However, as of 2019-11-23 this is still listed as "Beta" in the Quotas page, so 
 
 "you must complete the BigQuery Streaming V2 beta enrollment form in order to use [the V2 streaming insert quotas]"
 
+
+# Duplicate Message Testing
+
+Pub/Sub sometimes duplicates messages. To try and estimate how often, I created a quick test:
+
+publisher -> pub/sub -> subscriber -> BigQuery table
+
+This allows us to query the table after the fact to find messages that may have been duplicated. This
+lets us experiment with what might cause duplicates
+
+
+
+## Random numbers
+
+publisher n1-highcpu-2 wait_after_msgs: 500 goroutines:5 ~120% CPU consumption; published 50000000 total messages in 4m51.218470962s ; 171692.4 msgs/sec
+publisher n1-highcpu-2 wait_after_msgs: 500 goroutines:8 ~160% CPU consumption; published 80000000 total messages in 5m43.535952806s ; 232872.3 msgs/sec
+publisher n1-highcpu-2 wait_after_msgs: 2000 goroutines:8 ~180% CPU consumption; 80000000 total messages in 4m51.562106083s ; 274384.1 msgs/sec
