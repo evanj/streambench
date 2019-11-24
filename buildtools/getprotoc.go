@@ -10,28 +10,53 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 const version = "3.10.1"
 const protocURLTemplate = "https://github.com/protocolbuffers/protobuf/releases/download/v%s/protoc-%s-%s-x86_64.zip"
 const protocZipPath = "bin/protoc"
+const includeZipPath = "include/"
 
 var goosToProtocOS = map[string]string{
 	"darwin": "osx",
 	"linux":  "linux",
 }
 
-func main() {
-	output := flag.String("output", "", "Path where we should write the protoc binary")
-	flag.Parse()
+func shouldExtract(name string) bool {
+	return !strings.HasSuffix(name, "/") &&
+		(name == protocZipPath || strings.HasPrefix(name, includeZipPath))
+}
 
-	log.Printf("downloading protoc to local file %s ...", *output)
-	outputFile, err := os.OpenFile(*output, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0755)
+func extractFromZip(outputDir string, f *zip.File) error {
+	outputPath := filepath.Join(outputDir, f.Name)
+	log.Printf("writing %s ...", outputPath)
+	basePath := filepath.Dir(outputPath)
+	err := os.MkdirAll(basePath, 0700)
 	if err != nil {
-		panic(err)
+		return err
+	}
+	outputFile, err := os.OpenFile(outputPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, f.Mode())
+	if err != nil {
+		return err
 	}
 	defer outputFile.Close()
+
+	fileReader, err := f.Open()
+	if err != nil {
+		return err
+	}
+	defer fileReader.Close()
+
+	_, err = io.Copy(outputFile, fileReader)
+	return err
+}
+
+func main() {
+	outputDir := flag.String("outputDir", "", "Path were to write bin/protoc and include/*")
+	flag.Parse()
 
 	protocURL := fmt.Sprintf(protocURLTemplate, version, version, goosToProtocOS[runtime.GOOS])
 	log.Printf("downloading protoc from %s ...", protocURL)
@@ -52,27 +77,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	found := false
 	for _, f := range zipReader.File {
-		log.Println(f.Name)
-		if f.Name == protocZipPath {
-			fileReader, err := f.Open()
+		if shouldExtract(f.Name) {
+			err = extractFromZip(*outputDir, f)
 			if err != nil {
 				panic(err)
 			}
-			_, err = io.Copy(outputFile, fileReader)
-			if err != nil {
-				panic(err)
-			}
-			found = true
-			break
 		}
-	}
-	if !found {
-		err = os.Remove(*output)
-		if err != nil {
-			panic(err)
-		}
-		panic("protoc not found")
 	}
 }
