@@ -72,21 +72,23 @@ type cliArgs struct {
 
 func setUp(args cliArgs) error {
 	log.Println("creating pubsub topic/subscription")
-	mustGcloud("--project="+args.projectID, "pubsub", "topics", "create", args.topicID)
-	mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "create", "--topic="+args.topicID, args.subscriptionID)
+	// mustGcloud("--project="+args.projectID, "pubsub", "topics", "create", args.topicID)
+	// mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "create", "--topic="+args.topicID, args.subscriptionID)
 
-	log.Println("creating bigquery table")
-	mustBQ("--project="+args.projectID, "mk", args.datasetID)
-	mustBQ("--project="+args.projectID, "mk", "--table", args.datasetID+"."+args.tableID,
-		"goroutine_id:STRING,sequence:INTEGER,created:TIMESTAMP,subscriber_received:TIMESTAMP")
+	// log.Println("creating bigquery table")
+	// mustBQ("--project="+args.projectID, "mk", args.datasetID)
+	// mustBQ("--project="+args.projectID, "mk", "--table", args.datasetID+"."+args.tableID,
+	// 	"goroutine_id:STRING,sequence:INTEGER,created:TIMESTAMP,published:TIMESTAMP,subscriber_received:TIMESTAMP")
 
 	log.Println("building and publishing container images")
 	containerURL := fmt.Sprintf("gcr.io/%s/dupbenchpublisher", args.projectID)
-	mustGcloud("--project="+args.projectID, "builds", "submit", ".", "--tag="+containerURL)
+	mustGcloud("--project="+args.projectID, "builds", "submit", ".")
 
 	fmt.Printf("gcloud --project=%s compute instances create-with-container publisher-vm \\\n"+
 		"    --container-image=%s --zone=us-east1-c \\\n"+
 		"    --container-restart-policy=NEVER --machine-type=n1-highcpu-2 --preemptible \\\n"+
+		// scopes needed to stream rows to bigquery (subscriber)
+		"    --scopes=cloud-platform \\\n"+
 		"    --container-arg=--projectID=%s --container-arg=--numMessages=10000000 \\\n"+
 		"    --container-arg=--goroutines=8\n",
 		args.projectID, containerURL, args.projectID,
@@ -111,12 +113,15 @@ func tearDown(args cliArgs) error {
 		return err
 	}
 
-	images := []string{}
-	for _, digest := range shaDigests {
-		images = append(images, containerURL+"@"+digest)
+	if len(shaDigests) > 0 {
+		images := []string{}
+		for _, digest := range shaDigests {
+			images = append(images, containerURL+"@"+digest)
+		}
+		deleteArgs := append([]string{"--project=" + args.projectID,
+			"container", "images", "delete", "--force-delete-tags"}, images...)
+		mustGcloud(deleteArgs...)
 	}
-	deleteArgs := append([]string{"--project=" + args.projectID, "container", "images", "delete"}, images...)
-	mustGcloud(deleteArgs...)
 
 	return nil
 }

@@ -62,9 +62,9 @@ This allows us to query the table after the fact to find messages that may have 
 lets us experiment with what might cause duplicates
 
 
+## Random observations
 
-## Random numbers
+* When putting a batch of messages in an idle topic, sometimes some messages get "stuck" for the ack duration. E.g. put in 5000 messages, we get 4500 messages out, and the last 500 show up ~10 minutes later. It is as if something pulled them, then they have to retry. But the thing that pulled them was NOT our application. They won't even be CONSECUTIVE sequence numbers
 
-publisher n1-highcpu-2 wait_after_msgs: 500 goroutines:5 ~120% CPU consumption; published 50000000 total messages in 4m51.218470962s ; 171692.4 msgs/sec
-publisher n1-highcpu-2 wait_after_msgs: 500 goroutines:8 ~160% CPU consumption; published 80000000 total messages in 5m43.535952806s ; 232872.3 msgs/sec
-publisher n1-highcpu-2 wait_after_msgs: 2000 goroutines:8 ~180% CPU consumption; 80000000 total messages in 4m51.562106083s ; 274384.1 msgs/sec
+* Pubsub makes no guarantee of order, and when publishing batches in order, I definitely see them arrive at the subscribers out of order (e.g. we receive some of the very low and very high sequence numbers, while still missing 50% of the numbers in a batch). However, some other experiments have shown that when there is a large backlog, messages do arrive "mostly in order". It might be nice to quantify this.
+

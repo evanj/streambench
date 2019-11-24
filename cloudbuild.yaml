@@ -1,0 +1,9 @@
+# builds both the publisher and subscriber
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--target=publisher', '--tag=gcr.io/$PROJECT_ID/dupbenchpublisher', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--target=subscriber', '--tag=gcr.io/$PROJECT_ID/dupbenchsubscriber', '.']
+images:
+- 'gcr.io/$PROJECT_ID/dupbenchpublisher'
+- 'gcr.io/$PROJECT_ID/dupbenchsubscriber'
