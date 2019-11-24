@@ -19,9 +19,10 @@ var crc32cTable = crc32.MakeTable(crc32.Castagnoli)
 type testFixture struct {
 	msg    *messages.DuplicateTest
 	hasher hash.Hash32
+	buf    *proto.Buffer
 }
 
-func makeFixture() *testFixture {
+func makeFixture(b *testing.B) *testFixture {
 	ts, err := ptypes.TimestampProto(time.Unix(1574604732, 123456789))
 	if err != nil {
 		panic(err)
@@ -32,12 +33,23 @@ func makeFixture() *testFixture {
 		Created:     ts,
 	}
 	hasher := crc32.New(crc32cTable)
-	return &testFixture{msg, hasher}
+	buf := proto.NewBuffer(nil)
+	b.ReportAllocs()
+
+	return &testFixture{msg, hasher, buf}
+}
+
+func (f *testFixture) mustMarshalBuffer() {
+	err := f.buf.Marshal(f.msg)
+	if err != nil {
+		panic(err)
+	}
+	f.hasher.Write(f.buf.Bytes())
+	f.buf.Reset()
 }
 
 func BenchmarkMarshal(b *testing.B) {
-	fixture := makeFixture()
-	b.ReportAllocs()
+	fixture := makeFixture(b)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -51,48 +63,29 @@ func BenchmarkMarshal(b *testing.B) {
 }
 
 func BenchmarkBuffer(b *testing.B) {
-	fixture := makeFixture()
-	buf := proto.NewBuffer(make([]byte, proto.Size(fixture.msg)))
-	buf.Reset()
-	b.ReportAllocs()
+	fixture := makeFixture(b)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		err := buf.Marshal(fixture.msg)
-		if err != nil {
-			b.Fatal(err.Error())
-		}
-		fixture.hasher.Write(buf.Bytes())
-		buf.Reset()
+		fixture.mustMarshalBuffer()
 	}
 	preventCompilerRemovingBenchmark = fixture.hasher.Sum32()
 }
 
-func BenchmarkBufferTimeNew(b *testing.B) {
-	fixture := makeFixture()
-	buf := proto.NewBuffer(make([]byte, proto.Size(fixture.msg)))
-	buf.Reset()
-	b.ReportAllocs()
+func BenchmarkTimeNew(b *testing.B) {
+	fixture := makeFixture(b)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		fixture.msg.Created = ptypes.TimestampNow()
 
-		err := buf.Marshal(fixture.msg)
-		if err != nil {
-			b.Fatal(err.Error())
-		}
-		fixture.hasher.Write(buf.Bytes())
-		buf.Reset()
+		fixture.mustMarshalBuffer()
 	}
 	preventCompilerRemovingBenchmark = fixture.hasher.Sum32()
 }
 
-func BenchmarkBufferTimeReuse(b *testing.B) {
-	fixture := makeFixture()
-	buf := proto.NewBuffer(make([]byte, proto.Size(fixture.msg)))
-	buf.Reset()
-	b.ReportAllocs()
+func BenchmarkTimeReuse(b *testing.B) {
+	fixture := makeFixture(b)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -100,12 +93,7 @@ func BenchmarkBufferTimeReuse(b *testing.B) {
 		fixture.msg.Created.Seconds = t.Unix()
 		fixture.msg.Created.Nanos = int32(t.Nanosecond())
 
-		err := buf.Marshal(fixture.msg)
-		if err != nil {
-			b.Fatal(err.Error())
-		}
-		fixture.hasher.Write(buf.Bytes())
-		buf.Reset()
+		fixture.mustMarshalBuffer()
 	}
 	preventCompilerRemovingBenchmark = fixture.hasher.Sum32()
 }
