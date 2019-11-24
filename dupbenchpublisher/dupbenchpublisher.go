@@ -45,31 +45,28 @@ func publisherGoroutine(wg *sync.WaitGroup, topic *pubsub.Topic, idString string
 
 	ctx := context.Background()
 
-	// benchmarks show this is silghtly faster
-	buf := proto.NewBuffer(nil)
-
 	msg := &messages.DuplicateTest{
 		GoroutineId: idString,
 		Created:     ptypes.TimestampNow(),
 	}
-	psMsg := &pubsub.Message{}
+
 	results := []*pubsub.PublishResult{}
 	for i := 0; i < numMessages; i++ {
 		msg.Sequence = int64(i)
 		setTimestampNow(msg.Created)
-		err := buf.Marshal(msg)
+
+		// must create new pubsub.Message/bytes since Publish takes a reference
+		msgBytes, err := proto.Marshal(msg)
 		if err != nil {
 			panic(err)
 		}
 
-		psMsg.Data = buf.Bytes()
+		psMsg := &pubsub.Message{Data: msgBytes}
 		results = append(results, topic.Publish(ctx, psMsg))
 		if len(results) >= publishWaitAfterMessages {
 			waitForPublish(ctx, results)
 			results = results[:0]
 		}
-
-		buf.Reset()
 	}
 	waitForPublish(ctx, results)
 	log.Printf("goroutine %s exiting", idString)

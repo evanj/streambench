@@ -3,6 +3,7 @@ module github.com/evanj/streambench
 go 1.13
 
 require (
+	cloud.google.com/go/bigquery v1.0.1
 	cloud.google.com/go/pubsub v1.1.0
 	github.com/golang/protobuf v1.3.2
 	golang.org/x/tools v0.0.0-20191124021906-f5828fc9a103 // indirect
