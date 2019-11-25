@@ -3,7 +3,13 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--target=publisher', '--tag=gcr.io/$PROJECT_ID/dupbenchpublisher', '.']
 - name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--target=publisher-race', '--tag=gcr.io/$PROJECT_ID/dupbenchpublisher-race', '.']
+- name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--target=subscriber', '--tag=gcr.io/$PROJECT_ID/dupbenchsubscriber', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--target=subscriber-race', '--tag=gcr.io/$PROJECT_ID/dupbenchsubscriber-race', '.']
 images:
 - 'gcr.io/$PROJECT_ID/dupbenchpublisher'
+- 'gcr.io/$PROJECT_ID/dupbenchpublisher-race'
 - 'gcr.io/$PROJECT_ID/dupbenchsubscriber'
+- 'gcr.io/$PROJECT_ID/dupbenchsubscriber-race'

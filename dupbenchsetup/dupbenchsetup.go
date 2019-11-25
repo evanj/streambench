@@ -72,13 +72,13 @@ type cliArgs struct {
 
 func setUp(args cliArgs) error {
 	log.Println("creating pubsub topic/subscription")
-	// mustGcloud("--project="+args.projectID, "pubsub", "topics", "create", args.topicID)
-	// mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "create", "--topic="+args.topicID, args.subscriptionID)
+	mustGcloud("--project="+args.projectID, "pubsub", "topics", "create", args.topicID)
+	mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "create", "--topic="+args.topicID, args.subscriptionID)
 
-	// log.Println("creating bigquery table")
-	// mustBQ("--project="+args.projectID, "mk", args.datasetID)
-	// mustBQ("--project="+args.projectID, "mk", "--table", args.datasetID+"."+args.tableID,
-	// 	"goroutine_id:STRING,sequence:INTEGER,created:TIMESTAMP,published:TIMESTAMP,subscriber_received:TIMESTAMP")
+	log.Println("creating bigquery table")
+	mustBQ("--project="+args.projectID, "mk", args.datasetID)
+	mustBQ("--project="+args.projectID, "mk", "--table", args.datasetID+"."+args.tableID,
+		"goroutine_id:STRING,sequence:INTEGER,created:TIMESTAMP,published:TIMESTAMP,subscriber_received:TIMESTAMP")
 
 	log.Println("building and publishing container images")
 	containerURL := fmt.Sprintf("gcr.io/%s/dupbenchpublisher", args.projectID)
@@ -97,17 +97,10 @@ func setUp(args cliArgs) error {
 	return nil
 }
 
-func tearDown(args cliArgs) error {
-	log.Println("deleting pubsub topic/subscription")
-	mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "delete", args.subscriptionID)
-	mustGcloud("--project="+args.projectID, "pubsub", "topics", "delete", args.topicID)
+func deleteAllImages(projectID string, containerURL string) error {
+	log.Println("deleting container images %s ...", containerURL)
 
-	log.Println("deleting bigquery dataset")
-	mustBQ("--project="+args.projectID, "rm", "-r", "-f", args.datasetID)
-
-	log.Println("deleting container images")
-	containerURL := fmt.Sprintf("gcr.io/%s/dupbenchpublisher", args.projectID)
-	shaDigests, err := gcloudLines("--project="+args.projectID, "container", "images", "list-tags",
+	shaDigests, err := gcloudLines("--project="+projectID, "container", "images", "list-tags",
 		containerURL, "--format=value[no-transforms](digest)")
 	if err != nil {
 		return err
@@ -118,11 +111,33 @@ func tearDown(args cliArgs) error {
 		for _, digest := range shaDigests {
 			images = append(images, containerURL+"@"+digest)
 		}
-		deleteArgs := append([]string{"--project=" + args.projectID,
+		deleteArgs := append([]string{"--project=" + projectID,
 			"container", "images", "delete", "--force-delete-tags"}, images...)
 		mustGcloud(deleteArgs...)
 	}
+	return nil
+}
 
+func tearDown(args cliArgs) error {
+	log.Println("deleting pubsub topic/subscription")
+	mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "delete", args.subscriptionID)
+	mustGcloud("--project="+args.projectID, "pubsub", "topics", "delete", args.topicID)
+
+	log.Println("deleting bigquery dataset")
+	mustBQ("--project="+args.projectID, "rm", "-r", "-f", args.datasetID)
+
+	patterns := []string{"gcr.io/%s/dupbenchpublisher", "gcr.io/%s/dupbenchsubscriber"}
+	for _, pattern := range patterns {
+		containerURL := fmt.Sprintf(pattern, args.projectID)
+		err := deleteAllImages(args.projectID, containerURL)
+		if err != nil {
+			return err
+		}
+		err = deleteAllImages(args.projectID, containerURL+"-race")
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
