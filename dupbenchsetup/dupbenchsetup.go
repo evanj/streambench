@@ -98,7 +98,7 @@ func setUp(args cliArgs) error {
 }
 
 func deleteAllImages(projectID string, containerURL string) error {
-	log.Println("deleting container images %s ...", containerURL)
+	log.Printf("deleting container images %s ...", containerURL)
 
 	shaDigests, err := gcloudLines("--project="+projectID, "container", "images", "list-tags",
 		containerURL, "--format=value[no-transforms](digest)")
