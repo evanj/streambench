@@ -39,6 +39,7 @@ func waitForPublish(ctx context.Context, results []*pubsub.PublishResult) {
 		}
 	}
 }
+
 func publisherGoroutine(wg *sync.WaitGroup, topic *pubsub.Topic, idString string, numMessages int) {
 	defer wg.Done()
 	log.Printf("goroutine %s starting; %d numMessages", idString, numMessages)
