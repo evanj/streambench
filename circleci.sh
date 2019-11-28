@@ -26,6 +26,7 @@ CHANGED=$(git status --porcelain --untracked-files=no)
 if [ -n "${CHANGED}" ]; then
     echo "ERROR files were changed:" > /dev/stderr
     echo "$CHANGED" > /dev/stderr
+    git diff -u > /dev/stderr
     exit 10
 fi
 
