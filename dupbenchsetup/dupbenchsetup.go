@@ -73,7 +73,8 @@ type cliArgs struct {
 func setUp(args cliArgs) error {
 	log.Println("creating pubsub topic/subscription")
 	mustGcloud("--project="+args.projectID, "pubsub", "topics", "create", args.topicID)
-	mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "create", "--topic="+args.topicID, args.subscriptionID)
+	mustGcloud("--project="+args.projectID, "pubsub", "subscriptions", "create", "--ack-deadline=120",
+		"--topic="+args.topicID, args.subscriptionID)
 
 	log.Println("creating bigquery table")
 	mustBQ("--project="+args.projectID, "mk", args.datasetID)
@@ -126,7 +127,8 @@ func tearDown(args cliArgs) error {
 	log.Println("deleting bigquery dataset")
 	mustBQ("--project="+args.projectID, "rm", "-r", "-f", args.datasetID)
 
-	patterns := []string{"gcr.io/%s/dupbenchpublisher", "gcr.io/%s/dupbenchsubscriber"}
+	patterns := []string{"gcr.io/%s/dupbenchpublisher", "gcr.io/%s/dupbenchtickpublish",
+		"gcr.io/%s/dupbenchsubscriber"}
 	for _, pattern := range patterns {
 		containerURL := fmt.Sprintf(pattern, args.projectID)
 		err := deleteAllImages(args.projectID, containerURL)
