@@ -28,10 +28,4 @@ func main() {
 			panic(err)
 		}
 	}
-
-	// technically probably does not need to be closed since we are exiting
-	err = client.Close()
-	if err != nil {
-		panic(err)
-	}
 }
