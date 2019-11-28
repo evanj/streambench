@@ -70,6 +70,7 @@ func (c *Client) publisherGoroutine(wg *sync.WaitGroup, idString string) {
 	log.Printf("goroutine %s exiting", idString)
 }
 
+// Client publishes batches of messages to Pub/Sub.
 type Client struct {
 	goroutines   int
 	numMessages  int
@@ -77,6 +78,7 @@ type Client struct {
 	topic        *pubsub.Topic
 }
 
+// PublishBatch publishes one batch of messages.
 func (c *Client) PublishBatch() error {
 	start := time.Now()
 	log.Printf("starting batch ...")
@@ -121,6 +123,7 @@ func ParseClient() (*Client, error) {
 	return &Client{*goroutines, *numMessages, pubsubClient, topic}, nil
 }
 
+// Close flushes messages from the topic and stops the pub/sub client.
 func (c *Client) Close() error {
 	c.topic.Stop()
 	return c.pubsubClient.Close()
