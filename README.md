@@ -61,10 +61,36 @@ publisher -> pub/sub -> subscriber -> BigQuery table
 This allows us to query the table after the fact to find messages that may have been duplicated. This
 lets us experiment with what might cause duplicates
 
+## Useful Queries
+
+```sql
+-- Find batches with duplicates and show "progress on an "in flight" batch
+SELECT goroutine_id, COUNT(*) AS messages, COUNT(DISTINCT sequence) AS unique_sequence_nums,
+  MAX(sequence) AS max_sequenc, MIN(sequence) AS min_sequence
+FROM `dupbench.dupbench`
+GROUP BY goroutine_id
+
+SELECT goroutine_id, COUNT(*) as count, MAX(sequence) as max_seq, MIN(sequence) as min_seq,
+  MIN(created) as min_created, MAX(created) as max_created,
+  MIN(published) AS min_published, MAX(published) AS max_published,
+  MIN(subscriber_received) as min_received, MAX(subscriber_received) as max_received
+FROM `dupbench.dupbench`
+GROUP BY goroutine_id
+
+-- Find duplicated sequence numbers
+SELECT goroutine_id, sequence, COUNT(*) as count
+FROM `dupbench.dupbench`
+GROUP BY goroutine_id, sequence
+HAVING count > 1
+ORDER BY goroutine_id, sequence
+```
 
 ## Random observations
 
-* When putting a batch of messages in an idle topic, sometimes some messages get "stuck" for the ack duration. E.g. put in 5000 messages, we get 4500 messages out, and the last 500 show up ~10 minutes later. It is as if something pulled them, then they have to retry. But the thing that pulled them was NOT our application. They won't even be CONSECUTIVE sequence numbers
+* When deleting and recreating a BigQuery table with streaming inserts, it is unclear exactly where your rows are going to go. I'e seen cases where the next batch of inserts went missing. It seems possible they went to the deleted table?
 
-* Pubsub makes no guarantee of order, and when publishing batches in order, I definitely see them arrive at the subscribers out of order (e.g. we receive some of the very low and very high sequence numbers, while still missing 50% of the numbers in a batch). However, some other experiments have shown that when there is a large backlog, messages do arrive "mostly in order". It might be nice to quantify this.
+* Pubsub makes no guarantee of order, and when publishing batches in order, they arrive at the subscribers out of order (e.g. we receive some of the very low and very high sequence numbers, while still missing 50% of the numbers in a batch). However, some other experiments have shown that when there is a large backlog, messages do arrive "mostly in order". It might be nice to quantify this.
 
+* The most common cause of duplication seems to be "dropped acks." For example, we pull a batch of messages, ack them, then all those messages are later redelivered. This means while the duplication rate is pretty low, it is bursty, which can cause issues.
+
+* Sometimes some messages get "stuck" for the ack duration. E.g. put in 5000 messages, we get 4500 messages out, and the last 500 show up ~10 minutes later. It is as if something pulled them, then they have to retry. I saw this once when we had a "race" between the timeout on the pull request: our puller thinks we timed out, but pubsub thinks we got a batch.
