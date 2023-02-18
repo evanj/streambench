@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/evanj/streambench/messages"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // May or may not be necessary; better safe than sorry https://github.com/golang/go/issues/27400
@@ -19,33 +19,33 @@ var crc32cTable = crc32.MakeTable(crc32.Castagnoli)
 type testFixture struct {
 	msg    *messages.DuplicateTest
 	hasher hash.Hash32
-	buf    *proto.Buffer
+	buf    []byte
 }
 
 func makeFixture(b *testing.B) *testFixture {
-	ts, err := ptypes.TimestampProto(time.Unix(1574604732, 123456789))
-	if err != nil {
-		panic(err)
-	}
+	ts := timestamppb.New(time.Unix(1574604732, 123456789))
 	msg := &messages.DuplicateTest{
 		GoroutineId: "00000000000000000000000000000000",
 		Sequence:    123456,
 		Created:     ts,
 	}
 	hasher := crc32.New(crc32cTable)
-	buf := proto.NewBuffer(nil)
 	b.ReportAllocs()
 
-	return &testFixture{msg, hasher, buf}
+	return &testFixture{msg, hasher, nil}
 }
 
-func (f *testFixture) mustMarshalBuffer() {
-	err := f.buf.Marshal(f.msg)
+func (f *testFixture) mustMarshalAppend() {
+	byteLen := proto.Size(f.msg)
+	f.buf = f.buf[:0]
+	if cap(f.buf) < byteLen {
+		f.buf = make([]byte, 0, 2*byteLen)
+	}
+	out, err := proto.MarshalOptions{UseCachedSize: true}.MarshalAppend(f.buf, f.msg)
 	if err != nil {
 		panic(err)
 	}
-	f.hasher.Write(f.buf.Bytes())
-	f.buf.Reset()
+	f.hasher.Write(out)
 }
 
 func BenchmarkMarshal(b *testing.B) {
@@ -62,29 +62,29 @@ func BenchmarkMarshal(b *testing.B) {
 	preventCompilerRemovingBenchmark = fixture.hasher.Sum32()
 }
 
-func BenchmarkBuffer(b *testing.B) {
+func BenchmarkMarshalAppend(b *testing.B) {
 	fixture := makeFixture(b)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		fixture.mustMarshalBuffer()
+		fixture.mustMarshalAppend()
 	}
 	preventCompilerRemovingBenchmark = fixture.hasher.Sum32()
 }
 
-func BenchmarkTimeNew(b *testing.B) {
+func BenchmarkTimestampPBNow(b *testing.B) {
 	fixture := makeFixture(b)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		fixture.msg.Created = ptypes.TimestampNow()
+		fixture.msg.Created = timestamppb.Now()
 
-		fixture.mustMarshalBuffer()
+		fixture.mustMarshalAppend()
 	}
 	preventCompilerRemovingBenchmark = fixture.hasher.Sum32()
 }
 
-func BenchmarkTimeReuse(b *testing.B) {
+func BenchmarkTimestampPBReuse(b *testing.B) {
 	fixture := makeFixture(b)
 
 	b.ResetTimer()
@@ -93,7 +93,7 @@ func BenchmarkTimeReuse(b *testing.B) {
 		fixture.msg.Created.Seconds = t.Unix()
 		fixture.msg.Created.Nanos = int32(t.Nanosecond())
 
-		fixture.mustMarshalBuffer()
+		fixture.mustMarshalAppend()
 	}
 	preventCompilerRemovingBenchmark = fixture.hasher.Sum32()
 }

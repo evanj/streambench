@@ -9,11 +9,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	pubsub "cloud.google.com/go/pubsub/apiv1"
+	"cloud.google.com/go/pubsub/apiv1/pubsubpb"
 	"github.com/evanj/streambench/messages"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	pubsubpb "google.golang.org/genproto/googleapis/pubsub/v1"
+	"github.com/evanj/streambench/pubsubgrpc"
+	"google.golang.org/protobuf/proto"
 )
 
 // BQ streaming API suggests a max of 500 rows / insert
@@ -28,7 +27,7 @@ type bqSchema struct {
 }
 
 func subscriberGoroutine(
-	wg *sync.WaitGroup, subscriber *pubsub.SubscriberClient, fullSubscriptionName string,
+	wg *sync.WaitGroup, subscriber pubsubpb.SubscriberClient, fullSubscriptionName string,
 	inserter *bigquery.Inserter,
 ) {
 	defer wg.Done()
@@ -62,14 +61,8 @@ func subscriberGoroutine(
 			if err != nil {
 				panic(err)
 			}
-			created, err := ptypes.Timestamp(msg.Created)
-			if err != nil {
-				panic(err)
-			}
-			published, err := ptypes.Timestamp(receivedMsg.Message.PublishTime)
-			if err != nil {
-				panic(err)
-			}
+			created := msg.Created.AsTime()
+			published := receivedMsg.Message.PublishTime.AsTime()
 
 			row := bqSchema{msg.GoroutineId, msg.Sequence, created, published, pullTimestamp}
 			rows = append(rows, row)
@@ -82,7 +75,7 @@ func subscriberGoroutine(
 			}
 			rows = rows[:0]
 
-			err = subscriber.Acknowledge(ctx, ackReq)
+			_, err = subscriber.Acknowledge(ctx, ackReq)
 			if err != nil {
 				panic(err)
 			}
@@ -110,10 +103,11 @@ func main() {
 	fullSubscriptionName := fmt.Sprintf("projects/%s/subscriptions/%s", *projectID, *subscriptionID)
 
 	ctx := context.Background()
-	subscriber, err := pubsub.NewSubscriberClient(ctx)
+	conn, err := pubsubgrpc.Dial(ctx)
 	if err != nil {
 		panic(err)
 	}
+	subscriber := pubsubpb.NewSubscriberClient(conn)
 
 	bq, err := bigquery.NewClient(ctx, *projectID)
 	if err != nil {

@@ -9,33 +9,10 @@ import (
 	"strconv"
 	"time"
 
+	"cloud.google.com/go/pubsub/apiv1/pubsubpb"
+	"github.com/evanj/streambench/pubsubgrpc"
 	"google.golang.org/api/bigquery/v2"
-	"google.golang.org/genproto/googleapis/pubsub/v1"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/oauth"
-	"google.golang.org/grpc/metadata"
 )
-
-const pubsubEndpoint = "pubsub.googleapis.com:443"
-const pubsubScope = "https://www.googleapis.com/auth/pubsub"
-
-func connectPublisherGRPC(ctx context.Context, creds credentials.PerRPCCredentials) (pubsub.PublisherClient, error) {
-	grpcOpts := []grpc.DialOption{
-		grpc.WithPerRPCCredentials(creds),
-		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "")),
-		grpc.WithBlock(),
-	}
-	conn, err := grpc.DialContext(ctx, pubsubEndpoint, grpcOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return pubsub.NewPublisherClient(conn), nil
-}
-
-func topicPath(projectID string, topicID string) string {
-	return "projects/" + projectID + "/topics/" + topicID
-}
 
 func percentile(durations []time.Duration, percentile float64) time.Duration {
 	index := int(float64(len(durations)) * percentile)
@@ -47,18 +24,17 @@ type inserter interface {
 }
 
 type pubsubInserter struct {
-	publisher pubsub.PublisherClient
+	publisher pubsubpb.PublisherClient
 	topicPath string
 }
 
 func (p *pubsubInserter) insert(ctx context.Context, messages [][]byte) error {
-	req := &pubsub.PublishRequest{Topic: p.topicPath}
+	req := &pubsubpb.PublishRequest{Topic: p.topicPath}
 	for _, message := range messages {
-		req.Messages = append(req.Messages, &pubsub.PubsubMessage{Data: message})
+		req.Messages = append(req.Messages, &pubsubpb.PubsubMessage{Data: message})
 	}
 
-	md := metadata.Pairs("x-goog-request-params", "topic="+p.topicPath)
-	outCtx := metadata.NewOutgoingContext(ctx, md)
+	outCtx := pubsubgrpc.TopicRoutingCtx(ctx, p.topicPath)
 	resp, err := p.publisher.Publish(outCtx, req)
 	if err != nil {
 		return err
@@ -116,10 +92,6 @@ func main() {
 	fmt.Printf("BigQuery datasetID:%s tableID:%s\n", *datasetID, *tableID)
 
 	ctx := context.Background()
-	credentials, err := oauth.NewApplicationDefault(ctx, pubsubScope)
-	if err != nil {
-		panic(err)
-	}
 
 	// using the raw BigQuery API instead of the friendly Go API: Allows us to build the request directly
 	bq, err := bigquery.NewService(ctx)
@@ -130,11 +102,12 @@ func main() {
 	bqInsertNoInsertID := &bqInserter{bq, *projectID, *datasetID, *tableID, 0, false}
 
 	// create a raw gRPC publisher connection: the Go pubsub client defers work to background threads
-	publisher, err := connectPublisherGRPC(ctx, credentials)
+	conn, err := pubsubgrpc.Dial(ctx)
 	if err != nil {
 		panic(err)
 	}
-	pubsubInsert := &pubsubInserter{publisher, topicPath(*projectID, *topicID)}
+	publisher := pubsubpb.NewPublisherClient(conn)
+	pubsubInsert := &pubsubInserter{publisher, pubsubgrpc.TopicPath(*projectID, *topicID)}
 
 	// warm up the pub sub topic: it needs some traffic to get fast;
 	// the p90 publishing time is about 12ms, so this should happen fairly quickly

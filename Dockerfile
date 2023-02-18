@@ -1,37 +1,32 @@
 # Go build image
-FROM golang:1.13.4-buster AS go_builder
+FROM golang:1.20.1-bullseyebuster AS go_builder
 COPY . streambench
 WORKDIR streambench
-RUN go install --mod=readonly -v ./dupbenchpublisher ./dupbenchsubscriber ./dupbenchtickpublish && \
-  go build --race --mod=readonly -v -o /go/bin/dupbenchpublisher-race ./dupbenchpublisher && \
-  go build --race --mod=readonly -v -o /go/bin/dupbenchsubscriber-race ./dupbenchsubscriber
+RUN go install -v ./dupbenchpublisher ./dupbenchsubscriber ./dupbenchtickpublish && \
+  go build --race -v -o /go/bin/dupbenchpublisher-race ./dupbenchpublisher && \
+  go build --race -v -o /go/bin/dupbenchsubscriber-race ./dupbenchsubscriber
 
 
 # Subscriber image
-FROM gcr.io/distroless/base-debian10 AS subscriber-race
+FROM gcr.io/distroless/base-debian11:nonroot AS subscriber-race
 COPY --from=go_builder /go/bin/dupbenchsubscriber-race /
 ENTRYPOINT ["/dupbenchsubscriber-race"]
-USER nonroot
 
-FROM gcr.io/distroless/base-debian10 AS subscriber
+FROM gcr.io/distroless/base-debian11:nonroot AS subscriber
 COPY --from=go_builder /go/bin/dupbenchsubscriber /
 ENTRYPOINT ["/dupbenchsubscriber"]
-USER nonroot
 
 
 # Publisher image
-FROM gcr.io/distroless/base-debian10 AS publisher-race
+FROM gcr.io/distroless/base-debian11:nonroot AS publisher-race
 COPY --from=go_builder /go/bin/dupbenchpublisher-race /
 ENTRYPOINT ["/dupbenchpublisher-race"]
-USER nonroot
 
-FROM gcr.io/distroless/base-debian10 AS publisher
+FROM gcr.io/distroless/base-debian11:nonroot AS publisher
 COPY --from=go_builder /go/bin/dupbenchpublisher /
 ENTRYPOINT ["/dupbenchpublisher"]
-USER nonroot
 
 # Tick publisher
-FROM gcr.io/distroless/base-debian10 AS tickpublish
+FROM gcr.io/distroless/base-debian11:nonroot AS tickpublish
 COPY --from=go_builder /go/bin/dupbenchtickpublish /
 ENTRYPOINT ["/dupbenchtickpublish"]
-USER nonroot

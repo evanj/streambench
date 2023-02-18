@@ -20,7 +20,7 @@ func main() {
 	log.Printf("now:%s starting at %s ...",
 		now.Format(time.RFC3339), nextWakeUp.Format(time.RFC3339))
 	for {
-		time.Sleep(nextWakeUp.Sub(time.Now()))
+		time.Sleep(time.Until(nextWakeUp))
 		nextWakeUp = nextWakeUp.Add(*publishInterval)
 
 		err = client.PublishBatch()
