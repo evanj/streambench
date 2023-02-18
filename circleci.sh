@@ -8,6 +8,10 @@ set -x
 
 echo "WTF?"
 pwd
+echo "WTF2?"
+ls
+echo "WTF3?"
+cat go.mod
 
 # Ensure protocol buffer definitions are up to date
 make
@@ -20,6 +24,7 @@ go vet ./...
 
 staticcheck --checks=all ./...
 
+go fmt ./...
 # require that we use go mod tidy. TODO: there must be an easier way?
 go mod tidy
 CHANGED=$(git status --porcelain --untracked-files=no)
