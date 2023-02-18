@@ -6,13 +6,6 @@ set -euf -o pipefail
 # echo commands
 set -x
 
-echo "WTF?"
-pwd
-echo "WTF2?"
-ls
-echo "WTF3?"
-cat go.mod
-
 # Ensure protocol buffer definitions are up to date
 make
 
@@ -22,6 +15,7 @@ go test -count=2 -shuffle=on -race ./...
 # go test only checks some vet warnings; check all
 go vet ./...
 
+go install honnef.co/go/tools/cmd/staticcheck@latest
 staticcheck --checks=all ./...
 
 go fmt ./...
