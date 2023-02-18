@@ -6,6 +6,9 @@ set -euf -o pipefail
 # echo commands
 set -x
 
+echo "WTF?"
+pwd
+
 # Ensure protocol buffer definitions are up to date
 make
 
