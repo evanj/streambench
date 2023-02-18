@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"cloud.google.com/go/pubsub"
 	"github.com/evanj/streambench/messages"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // 16 = 128 bits which should make collisions "impossible"
