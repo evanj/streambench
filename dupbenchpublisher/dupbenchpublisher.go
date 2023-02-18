@@ -9,10 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
-
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"cloud.google.com/go/pubsub"
 	"github.com/evanj/streambench/messages"
 )
@@ -24,7 +22,7 @@ const goroutineIDLength = 16
 // to "fill" the pipeline and keep the publishing busy
 const publishWaitAfterMessages = 2000
 
-func setTimestampNow(ts *timestamp.Timestamp) {
+func setTimestampNow(ts *timestamppb.Timestamp) {
 	// stupidly over-optimized to avoid allocations (probably unnecessary)
 	t := time.Now()
 	ts.Seconds = t.Unix()
@@ -48,7 +46,7 @@ func publisherGoroutine(wg *sync.WaitGroup, topic *pubsub.Topic, idString string
 
 	msg := &messages.DuplicateTest{
 		GoroutineId: idString,
-		Created:     ptypes.TimestampNow(),
+		Created:     timestamppb.Now(),
 	}
 
 	results := []*pubsub.PublishResult{}

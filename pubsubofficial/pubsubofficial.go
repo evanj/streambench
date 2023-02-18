@@ -17,6 +17,9 @@ func main() {
 
 	ctx := context.Background()
 	publisher, err := pubsub.NewClient(ctx, *projectID)
+	if err != nil {
+		panic(err)
+	}
 	it := publisher.Topics(ctx)
 	for {
 		topic, err := it.Next()

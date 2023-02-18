@@ -1,3 +1,4 @@
+// Package dupbench contains shared code.
 package dupbench
 
 import (
@@ -11,9 +12,8 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/evanj/streambench/messages"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // 16 = 128 bits which should make collisions "impossible"
@@ -23,7 +23,7 @@ const goroutineIDLength = 16
 // to "fill" the pipeline and keep the publishing busy
 const publishWaitAfterMessages = 2000
 
-func setTimestampNow(ts *timestamp.Timestamp) {
+func setTimestampNow(ts *timestamppb.Timestamp) {
 	// stupidly over-optimized to avoid allocations (probably unnecessary)
 	t := time.Now()
 	ts.Seconds = t.Unix()
@@ -45,7 +45,7 @@ func (c *Client) publisherGoroutine(wg *sync.WaitGroup, idString string) {
 	ctx := context.Background()
 	msg := &messages.DuplicateTest{
 		GoroutineId: idString,
-		Created:     ptypes.TimestampNow(),
+		Created:     timestamppb.Now(),
 	}
 
 	results := []*pubsub.PublishResult{}
