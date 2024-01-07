@@ -6,6 +6,8 @@ This is a quick-and-dirty benchmark comparing Google Cloud Pub/Sub publish and B
 * BigQuery streaming inserts are pretty slow: p50: 75ms; p95: 110ms
 * Setting insertID or not does not change BigQuery performance substantially.
 
+*ARCHIVED 2024-01-07*: I haven't used this in years. I did one last set of updates, and it passed the CI tests, but I am marking this archived. It might be useful to me or others in the future ... maybe, but that becomes less likely as time goes on.
+
 
 ## Create necessary resources
 
